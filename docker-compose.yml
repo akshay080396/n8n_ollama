@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  postgres-server:
+    image: postgres:12
+    container_name: postgres-server
+    environment:
+      POSTGRES_DB: mcp_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mcp_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "5052:80"
+    depends_on:
+      postgres-server:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - mcp_network
+    restart: unless-stopped
+
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama # Using our custom Dockerfile for curl
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./entrypoint.sh:/tmp/entrypoint.sh # Mount script to /tmp
+    networks:
+      - mcp_network
+    entrypoint: ["/tmp/entrypoint.sh"] # Use the script from /tmp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+    restart: unless-stopped
+
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamlit-app
+    ports:
+      - "8501:8501"
+    environment:
+      DB_NAME: mcp_test
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_HOST: postgres-server
+      DB_PORT: 5432
+      OLLAMA_HOST: ollama:11434
+    depends_on:
+      postgres-server:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    networks:
+      - mcp_network
+    volumes:
+      - ./app.py:/app/app.py
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  ollama_data:
+
+networks:
+  mcp_network:
+    driver: bridge

@@ -1,0 +1,9 @@
+# Use the official Ollama image as the base
+FROM ollama/ollama:latest
+
+# Install curl (using apt-get as Ollama base is Debian/Ubuntu based)
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Keep the original Ollama entrypoint (our script will run over it using docker-compose entrypoint)
+# COPY --from=ollama/ollama:latest /usr/bin/ollama /usr/bin/ollama
+# ENTRYPOINT ["/usr/bin/ollama"]
