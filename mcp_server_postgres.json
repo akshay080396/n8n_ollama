@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "postgres-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "crystaldba/postgres-mcp",
+        "--access-mode=unrestricted",
+        "postgresql://postgres:password@host.docker.internal:5432/mcp_test"
+      ]
+    }
+  }
+} 
