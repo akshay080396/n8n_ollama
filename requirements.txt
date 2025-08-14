@@ -1,6 +1,7 @@
 streamlit
 pandas
+numpy
 plotly
-sqlalchemy
 requests
-psycopg2-binary
+pymongo==4.3.3
+sqlalchemy

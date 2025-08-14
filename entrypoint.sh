@@ -20,19 +20,22 @@ while ! curl -s http://localhost:11434/api/tags > /dev/null; do
 done
 echo "Ollama API is responsive."
 
-# Check if the llama3 model already exists before pulling
+# Determine which model to use (default to GPT-NeoX 20B if not provided)
+MODEL="${OLLAMA_MODEL:-gpt-oss:20b}"
+
+# Check if the model already exists before pulling
 # This prevents re-downloading on subsequent restarts
-if ! ollama list | grep -q "llama3"; then
-  echo "llama3 model not found. Pulling llama3 model (this may take a while)..."
-  ollama pull llama3
+if ! ollama list | grep -q "$MODEL"; then
+  echo "Model '$MODEL' not found. Pulling (this may take a while)..."
+  ollama pull "$MODEL"
   if [ $? -ne 0 ]; then
-    echo "Failed to pull llama3 model. Check logs for details and ensure sufficient RAM."
+    echo "Failed to pull model '$MODEL'. Check logs for details and ensure sufficient resources."
     kill $OLLAMA_PID # Kill the background ollama serve process
     exit 1
   fi
-  echo "llama3 model pulled successfully."
+  echo "Model '$MODEL' pulled successfully."
 else
-  echo "llama3 model already exists in the volume."
+  echo "Model '$MODEL' already exists in the volume."
 fi
 
 # Wait for the background ollama serve process to keep the container alive

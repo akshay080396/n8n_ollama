@@ -4,11 +4,9 @@ FROM python:3.9-slim-buster
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies needed for psycopg2 (PostgreSQL adapter)
-# and curl for Ollama healthcheck
+# Install system dependencies needed for curl (Ollama healthcheck)
+# Removed gcc and libpq-dev as they were for psycopg2
 RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
     curl \
     # Clean up APT when done to reduce image size
     && rm -rf /var/lib/apt/lists/*

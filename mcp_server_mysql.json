@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "mysql-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@benborla29/mcp-server-mysql"
+      ],
+      "env": {
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "mysqluser",
+        "MYSQL_PASS": "mysqlpassword",
+        "MYSQL_DB": "mcp_test",
+        "ALLOW_INSERT_OPERATION": "true",
+        "ALLOW_UPDATE_OPERATION": "true",
+        "ALLOW_DELETE_OPERATION": "true"
+      }
+    }
+  }
+} 
