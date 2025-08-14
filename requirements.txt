@@ -1,7 +1,0 @@
-streamlit
-pandas
-numpy
-plotly
-requests
-pymongo==4.3.3
-sqlalchemy
